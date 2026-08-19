@@ -1,0 +1,263 @@
+
+def is_valid_dna(dna):
+    dna = dna.upper()
+
+    for base in dna:
+        if base not in "ATGC":
+            return False
+
+    return True
+
+
+
+
+def get_complement(dna):
+    complement = ""
+
+    for base in dna:
+        if base == "A":
+            complement += "T"
+        elif base == "T":
+            complement += "A"
+        elif base == "G":
+            complement += "C"
+        elif base == "C":
+            complement += "G"
+
+    return complement
+
+
+
+
+def nucleotide_counts(dna):
+    return {
+        "A": dna.count("A"),
+        "T": dna.count("T"),
+        "G": dna.count("G"),
+        "C": dna.count("C")
+    }
+
+
+
+
+def gc_content(dna):
+    counts = nucleotide_counts(dna)
+
+    return (counts["G"] + counts["C"]) / len(dna) * 100
+
+
+
+
+def transcribe_dna(dna):
+    dna = dna.upper()
+    dna = dna.replace(" ", "")
+
+    if not is_valid_dna(dna):
+        return "Invalid DNA sequence"
+
+    rna = dna.replace("T", "U")
+
+    return rna
+
+
+
+
+def get_codons(rna):
+    codons = []
+
+    for i in range(0, len(rna), 3):
+        codon = rna[i:i+3]
+        codons.append(codon)
+
+    return codons
+
+
+
+
+codon_table = {
+
+    "UUU": "Phenylalanine",
+    "UUC": "Phenylalanine",
+    "UUA": "Leucine",
+    "UUG": "Leucine",
+
+    "UCU": "Serine",
+    "UCC": "Serine",
+    "UCA": "Serine",
+    "UCG": "Serine",
+
+    "UAU": "Tyrosine",
+    "UAC": "Tyrosine",
+    "UAA": "STOP",
+    "UAG": "STOP",
+
+    "UGU": "Cysteine",
+    "UGC": "Cysteine",
+    "UGA": "STOP",
+    "UGG": "Tryptophan",
+
+    "CUU": "Leucine",
+    "CUC": "Leucine",
+    "CUA": "Leucine",
+    "CUG": "Leucine",
+
+    "CCU": "Proline",
+    "CCC": "Proline",
+    "CCA": "Proline",
+    "CCG": "Proline",
+
+    "CAU": "Histidine",
+    "CAC": "Histidine",
+    "CAA": "Glutamine",
+    "CAG": "Glutamine",
+
+    "CGU": "Arginine",
+    "CGC": "Arginine",
+    "CGA": "Arginine",
+    "CGG": "Arginine",
+
+    "AUU": "Isoleucine",
+    "AUC": "Isoleucine",
+    "AUA": "Isoleucine",
+    "AUG": "Methionine",
+
+    "ACU": "Threonine",
+    "ACC": "Threonine",
+    "ACA": "Threonine",
+    "ACG": "Threonine",
+
+    "AAU": "Asparagine",
+    "AAC": "Asparagine",
+    "AAA": "Lysine",
+    "AAG": "Lysine",
+
+    "AGU": "Serine",
+    "AGC": "Serine",
+    "AGA": "Arginine",
+    "AGG": "Arginine",
+
+    "GUU": "Valine",
+    "GUC": "Valine",
+    "GUA": "Valine",
+    "GUG": "Valine",
+
+    "GCU": "Alanine",
+    "GCC": "Alanine",
+    "GCA": "Alanine",
+    "GCG": "Alanine",
+
+    "GAU": "Aspartic acid",
+    "GAC": "Aspartic acid",
+    "GAA": "Glutamic acid",
+    "GAG": "Glutamic acid",
+
+    "GGU": "Glycine",
+    "GGC": "Glycine",
+    "GGA": "Glycine",
+    "GGG": "Glycine"
+}
+
+
+
+
+def translate_rna(rna):
+
+    rna = rna.upper()
+    rna = rna.replace(" ", "")
+
+    # Check that RNA contains only A, U, G and C
+    for base in rna:
+        if base not in "AUGC":
+            return "Invalid RNA sequence"
+
+    codons = get_codons(rna)
+
+    protein = []
+    started = False
+
+    for codon in codons:
+
+        # Ignore incomplete codons
+        if len(codon) != 3:
+            continue
+
+        # Wait for the start codon
+        if not started:
+
+            if codon == "AUG":
+                started = True
+                protein.append("Methionine")
+
+            continue
+
+        # Translate codon
+        amino_acid = codon_table[codon]
+
+        # Stop translation
+        if amino_acid == "STOP":
+            protein.append("STOP")
+            break
+
+        protein.append(amino_acid)
+
+    if not started:
+        return "No start codon found"
+
+    return protein
+
+
+
+
+def analyze_dna(dna):
+
+    dna = dna.upper()
+    dna = dna.replace(" ", "")
+
+    if not is_valid_dna(dna):
+        print("Invalid DNA sequence")
+        return
+
+    length = len(dna)
+
+    counts = nucleotide_counts(dna)
+
+    gc = gc_content(dna)
+
+    complement = get_complement(dna)
+
+    rna = transcribe_dna(dna)
+
+    protein = translate_rna(rna)
+
+    print("================================")
+    print("       DNA SEQUENCE ANALYZER")
+    print("================================")
+
+    print("Sequence:", dna)
+    print("Valid DNA: True")
+    print("Length:", length)
+
+    print("\nNUCLEOTIDE COUNTS")
+    print("-----------------")
+    print("A:", counts["A"])
+    print("T:", counts["T"])
+    print("G:", counts["G"])
+    print("C:", counts["C"])
+
+    print("\nGC CONTENT")
+    print("----------")
+    print(round(gc, 2), "%")
+
+    print("\nDNA COMPLEMENT")
+    print("--------------")
+    print(complement)
+
+    print("\nRNA TRANSCRIPT")
+    print("--------------")
+    print(rna)
+
+    print("\nPROTEIN")
+    print("-------")
+    print(protein)
+
+    print("================================")
